@@ -1,0 +1,22 @@
+Useful report ideas for viva and demonstration:
+
+1. Total registered patients
+- Count all documents in patients collection.
+
+2. Total consultations done
+- Count all documents in consultations collection.
+
+3. Gender wise count
+- Group patients by gender.
+
+4. Age group report
+- Group patients into Below 18, 18-40, 41-60, Above 60.
+
+5. Disease trend report
+- Group consultations by diagnosis and count frequency.
+
+6. Search report
+- Search by patient name or patient ID.
+
+7. Filter report
+- Filter consultations by doctor, date, or disease.

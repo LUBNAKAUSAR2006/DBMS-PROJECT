@@ -1,0 +1,35 @@
+{
+  "camps": [
+    {
+      "campName": "General Health Camp",
+      "campDate": "2026-06-15",
+      "location": "City Hall",
+      "purpose": "General checkup"
+    }
+  ],
+  "doctors": [
+    {
+      "doctorName": "Dr. Anil Kumar",
+      "specialization": "General Physician"
+    }
+  ],
+  "patients": [
+    {
+      "patientId": "PAT001",
+      "fullName": "Riya Sharma",
+      "age": 22,
+      "gender": "Female",
+      "phone": "9876543210",
+      "city": "Bangalore"
+    }
+  ],
+  "consultations": [
+    {
+      "tokenNumber": 1,
+      "symptoms": "Fever and headache",
+      "diagnosis": "Viral Fever",
+      "medicines": "Paracetamol",
+      "status": "Completed"
+    }
+  ]
+}

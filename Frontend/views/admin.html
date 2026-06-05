@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Health Camp System</title>
+    <link rel="stylesheet" href="/public/css/style.css">
+</head>
+<body data-page="admin">
+    <header class="page-header">
+        <div>
+            <h1>Admin Panel</h1>
+            <p>Create camps, assign registered doctors, and remove camps if no patient is linked.</p>
+        </div>
+        <nav class="nav-links">
+            <a href="/dashboard">Dashboard</a>
+            <a href="/reports">Reports</a>
+            <button type="button" id="logoutButton">Logout</button>
+        </nav>
+    </header>
+
+    <main class="page-content two-column-layout">
+        <section class="card">
+            <h2>Add Camp</h2>
+            <p class="card-note">Admin creates a camp and assigns any registered doctors to that camp.</p>
+            <form id="campForm" class="simple-form">
+                <label>Camp Name<span class="helper-text">Example: General Health Camp</span><input type="text" name="campName" required></label>
+                <label>Camp Date<input type="date" name="campDate" required></label>
+                <label>Location<span class="helper-text">Example: Community Hall, College Campus</span><input type="text" name="location" required></label>
+                <label>Purpose<span class="helper-text">Example: Eye checkup or general screening</span><input type="text" name="purpose" required></label>
+                <label>Assign Doctors
+                    <select id="campDoctors" name="assignedDoctors" multiple required></select>
+                </label>
+                <button type="submit">Save Camp</button>
+            </form>
+        </section>
+
+        <section class="card">
+            <h2>Available Camps</h2>
+            <div id="campList" class="list-box"></div>
+        </section>
+
+        <section class="card">
+            <h2>Registered Doctors</h2>
+            <div id="doctorList" class="list-box"></div>
+        </section>
+    </main>
+
+    <script src="/public/js/main.js"></script>
+</body>
+</html>

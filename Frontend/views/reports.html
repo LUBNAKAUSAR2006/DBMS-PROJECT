@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reports - Health Camp System</title>
+    <link rel="stylesheet" href="/public/css/style.css">
+</head>
+<body data-page="reports">
+    <header class="page-header">
+        <div>
+            <h1>Reports</h1>
+            <p id="reportPageDescription">Download reports and view data allowed for your role.</p>
+        </div>
+        <nav class="nav-links">
+            <a href="/dashboard">Dashboard</a>
+            <a href="/admin" data-roles="Admin">Admin</a>
+            <a href="/register" data-roles="Patient">Patient Registration</a>
+            <button type="button" id="logoutButton">Logout</button>
+        </nav>
+    </header>
+
+    <main class="page-content">
+        <section class="card">
+            <h2 id="reportSummaryTitle">Summary</h2>
+            <p class="card-note" id="reportSummaryNote">This section shows simple analytics built from MongoDB data using count and aggregation queries.</p>
+            <div class="summary-grid">
+                <div class="summary-box"><span>Total Patients</span><strong id="reportTotalPatients">0</strong></div>
+                <div class="summary-box"><span>Total Registrations</span><strong id="reportTotalRegistrations">0</strong></div>
+            </div>
+            <div class="chart-area">
+                <div id="genderChartCard">
+                    <h3>Gender Count</h3>
+                    <div id="genderChart"></div>
+                </div>
+                <div id="ageChartCard">
+                    <h3>Age Groups</h3>
+                    <div id="ageChart"></div>
+                </div>
+                <div id="diseaseChartCard">
+                    <h3>Disease Trends</h3>
+                    <div id="diseaseChart"></div>
+                </div>
+            </div>
+        </section>
+
+        <section class="card">
+            <h2>Search and Filters</h2>
+            <p class="card-note" id="reportFilterNote">Use these fields to search by patient, filter by date, disease, or doctor, and export the result.</p>
+            <form id="reportFilterForm" class="filter-form">
+                <input type="text" name="keyword" placeholder="Search by patient name or patient ID">
+                <input type="date" name="date">
+                <input type="text" name="disease" placeholder="Filter by disease">
+                <div id="reportDoctorFilterWrapper">
+                    <select id="reportDoctorFilter" name="doctorId"></select>
+                </div>
+                <div class="button-row">
+                    <button type="submit">Apply Filters</button>
+                    <button type="button" id="csvExportButton">Download CSV</button>
+                    <button type="button" id="pdfExportButton">Download PDF</button>
+                </div>
+            </form>
+        </section>
+
+        <section class="card">
+            <h2 id="reportTableTitle">Registration Table</h2>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Patient ID</th>
+                            <th>Name</th>
+                            <th>Doctor</th>
+                            <th>Camp</th>
+                            <th>Symptoms</th>
+                            <th>Diagnosis</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody id="reportTableBody"></tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <script src="/public/js/main.js"></script>
+</body>
+</html>

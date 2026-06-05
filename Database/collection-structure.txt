@@ -1,0 +1,36 @@
+Project Name: Smart Health Camp Registration & Reporting System
+
+1. camps collection
+- campName
+- campDate
+- location
+- purpose
+
+2. doctors collection
+- doctorName
+- specialization
+- camp
+
+3. patients collection
+- patientId
+- fullName
+- age
+- gender
+- phone
+- city
+
+4. consultations collection
+- patient
+- camp
+- doctor
+- tokenNumber
+- symptoms
+- diagnosis
+- medicines
+- registrationTime
+- status
+
+Relationships:
+- One camp can have many doctors.
+- One patient can have many consultations.
+- One doctor can handle many consultations.

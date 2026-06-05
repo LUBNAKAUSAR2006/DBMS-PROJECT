@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome - Health Camp System</title>
+    <link rel="stylesheet" href="/public/css/style.css">
+</head>
+<body data-page="landing">
+    <header class="page-header">
+        <div>
+            <h1>Smart Health Camp Registration & Reporting System</h1>
+            <p>Role-based access for admin, patient, and doctor users.</p>
+        </div>
+        <nav class="nav-links">
+            <a href="/auth?mode=login&role=Admin">Admin Login</a>
+            <a href="/auth?mode=login&role=Patient">Patient Login</a>
+            <a href="/auth?mode=login&role=Doctor">Doctor Login</a>
+        </nav>
+    </header>
+
+    <main class="page-content">
+        <section class="hero-panel">
+            <article class="card hero-card">
+                <h2>Secure Entry</h2>
+                <p>Users must log in first. After login, they can access only the pages and actions allowed for their role.</p>
+                <ul class="hero-list">
+                    <li>Admin can manage camps, doctors, and reports.</li>
+                    <li>Patient can register for camp and download own report.</li>
+                    <li>Doctor can view and complete assigned consultations.</li>
+                </ul>
+            </article>
+            <article class="card">
+                <h2>Choose Your Role</h2>
+                <p>Select the correct role to continue with login or registration.</p>
+            </article>
+        </section>
+
+        <section class="card-grid">
+            <article class="card">
+                <h2>Admin</h2>
+                <p>Manage camps, assign registered doctors, and view overall reports.</p>
+                <div class="button-row">
+                    <a class="button-link" href="/auth?mode=login&role=Admin">Login</a>
+                </div>
+            </article>
+            <article class="card">
+                <h2>Patient</h2>
+                <p>Register for a camp, track diagnosis, and download personal report.</p>
+                <div class="button-row">
+                    <a class="button-link" href="/auth?mode=login&role=Patient">Login</a>
+                    <a class="button-link secondary-link" href="/auth?mode=register&role=Patient">Register</a>
+                </div>
+            </article>
+            <article class="card">
+                <h2>Doctor</h2>
+                <p>View assigned patients and update consultation details.</p>
+                <div class="button-row">
+                    <a class="button-link" href="/auth?mode=login&role=Doctor">Login</a>
+                    <a class="button-link secondary-link" href="/auth?mode=register&role=Doctor">Register</a>
+                </div>
+            </article>
+        </section>
+    </main>
+
+    <script src="/public/js/auth.js"></script>
+</body>
+</html>

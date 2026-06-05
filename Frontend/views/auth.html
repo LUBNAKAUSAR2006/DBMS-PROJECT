@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Health Camp System</title>
+    <link rel="stylesheet" href="/public/css/style.css">
+</head>
+<body data-page="auth">
+    <header class="page-header">
+        <div>
+            <h1>Login and Registration</h1>
+            <p>Each user logs in with a role-specific account. Only that role's pages and APIs are accessible after login.</p>
+        </div>
+        <nav class="nav-links">
+            <a href="/">Back to Landing Page</a>
+        </nav>
+    </header>
+
+    <main class="page-content two-column-layout auth-layout">
+        <section class="card">
+            <h2 id="authTitle">Login</h2>
+            <p class="card-note" id="authNote">Use the fields below to continue.</p>
+
+            <div class="switch-row">
+                <button type="button" class="switch-button" id="loginModeButton">Login</button>
+                <button type="button" class="switch-button" id="registerModeButton">Register</button>
+            </div>
+
+            <form id="authForm" class="simple-form">
+                <input type="hidden" name="role" id="authRole">
+                <label id="fullNameField" class="hidden-field" hidden>Full Name<input type="text" name="fullName"></label>
+                <label>Email<input type="email" name="email" required></label>
+                <label id="contactField" class="hidden-field" hidden>Contact Number<input type="text" name="contactNumber"></label>
+                <label id="specializationField" class="hidden-field" hidden>Specialization<input type="text" name="specialization"></label>
+                <label>Password<input type="password" name="password" required></label>
+                <label id="confirmPasswordField" class="hidden-field" hidden>Confirm Password<input type="password" name="confirmPassword"></label>
+                <button type="submit" id="authSubmitButton">Login</button>
+            </form>
+            <div id="authMessage" class="result-box"></div>
+        </section>
+
+        <section class="card">
+            <h2>How It Works</h2>
+            <ul class="hero-list auth-help-list">
+                <li>Admin does not register. Use fixed login: admin@gmail.com / Admin@123.</li>
+                <li>Patient can self-register for camp and download own report.</li>
+                <li>Doctor registers with name, email, contact number, and specialization.</li>
+                <li>Registration stores data in MongoDB and redirects to the login page for that role.</li>
+            </ul>
+        </section>
+    </main>
+
+    <script src="/public/js/auth.js"></script>
+</body>
+</html>

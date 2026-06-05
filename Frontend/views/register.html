@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Volunteer - Patient Registration</title>
+    <link rel="stylesheet" href="/public/css/style.css">
+</head>
+<body data-page="register">
+    <header class="page-header">
+        <div>
+            <h1>Patient Camp Registration</h1>
+            <p>Patient can register for a health camp and generate a token number.</p>
+        </div>
+        <nav class="nav-links">
+            <a href="/dashboard">Dashboard</a>
+            <a href="/reports">My Reports</a>
+            <button type="button" id="logoutButton">Logout</button>
+        </nav>
+    </header>
+
+    <main class="page-content two-column-layout">
+        <section class="card">
+            <h2>Register For Camp</h2>
+            <p class="card-note">Your account name, email, and contact are used automatically. Add medical details and select camp and doctor.</p>
+            <form id="registrationForm" class="simple-form">
+                <label>Full Name<input type="text" id="patientAccountName" readonly></label>
+                <label>Email<input type="email" id="patientAccountEmail" readonly></label>
+                <label>Contact Number<input type="text" id="patientAccountContact" readonly></label>
+                <label>Age<input type="number" name="age" min="1" required></label>
+                <label>Gender
+                    <select name="gender" required>
+                        <option value="">Select</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </label>
+                <label>City<input type="text" name="city" required></label>
+                <label>Camp<select id="patientCamp" name="campId" required></select></label>
+                <label>Doctor<select id="patientDoctor" name="doctorId" required></select></label>
+                <label>Symptoms<textarea name="symptoms" rows="3" placeholder="Fever, cough, headache"></textarea></label>
+                <label>Previous Reports<textarea name="previousReports" rows="3" placeholder="Mention previous reports or upload notes summary"></textarea></label>
+                <label>Previous Consultation Details<textarea name="previousConsultationDetails" rows="3" placeholder="Mention previous treatment, allergies, or old diagnosis"></textarea></label>
+                <button type="submit">Register Patient</button>
+            </form>
+        </section>
+
+        <section class="card">
+            <h2>Latest Registration</h2>
+            <div class="mini-grid">
+                <div class="mini-stat">
+                    <span>Patient ID</span>
+                    <strong>Auto Generated</strong>
+                </div>
+                <div class="mini-stat">
+                    <span>Token Number</span>
+                    <strong>Camp-wise Queue</strong>
+                </div>
+            </div>
+            <div id="registrationResult" class="result-box">No camp registration yet.</div>
+        </section>
+    </main>
+
+    <script src="/public/js/main.js"></script>
+</body>
+</html>

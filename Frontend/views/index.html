@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Health Camp System</title>
+    <link rel="stylesheet" href="/public/css/style.css">
+</head>
+<body data-page="home">
+    <header class="page-header">
+        <div>
+            <h1>Dashboard</h1>
+            <p>Role-based dashboard for the Smart Health Camp Registration & Reporting System.</p>
+        </div>
+        <nav class="nav-links">
+            <a href="/dashboard">Dashboard</a>
+            <a href="/admin" data-roles="Admin">Admin</a>
+            <a href="/register" data-roles="Volunteer">Volunteer</a>
+            <a href="/consultation" data-roles="Doctor">Doctor</a>
+            <a href="/reports" data-roles="Admin">Reports</a>
+            <button type="button" id="logoutButton">Logout</button>
+        </nav>
+    </header>
+
+    <main class="page-content">
+        <section class="hero-panel">
+            <article class="card hero-card">
+                <h2>System Flow</h2>
+                <p>This page is only visible after login. The cards below are shown according to the logged-in user role.</p>
+                <ul class="hero-list">
+                    <li>Admin creates a camp and adds doctors.</li>
+                    <li>Volunteer registers a patient and gets a token number.</li>
+                    <li>Doctor views pending patients and updates diagnosis.</li>
+                    <li>Admin checks reports and exports data.</li>
+                </ul>
+            </article>
+            <article class="card">
+                <h2>Project Focus</h2>
+                <p>This application demonstrates CRUD operations, relationships, search, filters, reporting, and data export using a simple stack.</p>
+            </article>
+        </section>
+
+        <section class="card-grid">
+            <article class="card" data-roles="Admin">
+                <h2>Admin Work</h2>
+                <p>Create camps and assign doctors to camps.</p>
+                <a class="button-link" href="/admin">Open Admin Page</a>
+            </article>
+            <article class="card" data-roles="Patient">
+                <h2>Patient Work</h2>
+                <p>Register for a health camp and get assigned token number.</p>
+                <a class="button-link" href="/register">Open Registration Page</a>
+            </article>
+            <article class="card" data-roles="Doctor">
+                <h2>Doctor Work</h2>
+                <p>View assigned patients and update diagnosis details.</p>
+                <a class="button-link" href="/consultation">Open Consultation Page</a>
+            </article>
+            <article class="card" data-roles="Admin,Patient">
+                <h2>Reports</h2>
+                <p>Check reports and download data allowed for your role.</p>
+                <a class="button-link" href="/reports">Open Reports Page</a>
+            </article>
+        </section>
+
+        <section class="card">
+            <h2>Logged-in User</h2>
+            <p class="card-note">These values are taken from the database and updated from the report API.</p>
+            <div class="summary-grid">
+                <div class="summary-box">
+                    <span>Name</span>
+                    <strong id="currentUserName">-</strong>
+                </div>
+                <div class="summary-box">
+                    <span>Role</span>
+                    <strong id="currentUserRole">-</strong>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="/public/js/main.js"></script>
+</body>
+</html>

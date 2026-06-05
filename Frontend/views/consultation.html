@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctor - Consultation</title>
+    <link rel="stylesheet" href="/public/css/style.css">
+</head>
+<body data-page="consultation">
+    <header class="page-header">
+        <div>
+            <h1>Doctor Consultation Panel</h1>
+            <p>Doctors can view assigned patients and complete consultation.</p>
+        </div>
+        <nav class="nav-links">
+            <a href="/dashboard">Dashboard</a>
+            <button type="button" id="logoutButton">Logout</button>
+        </nav>
+    </header>
+
+    <main class="page-content">
+        <section class="card">
+            <h2>My Assigned Patients</h2>
+            <p class="card-note">Doctor can view assigned patients, see consultation status, and mark pending records as consulted.</p>
+        </section>
+
+        <section class="card">
+            <h2>Consultation Table</h2>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Patient ID</th>
+                            <th>Patient Name</th>
+                            <th>Camp</th>
+                            <th>Symptoms</th>
+                            <th>Previous Details</th>
+                            <th>Action</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="pendingConsultations"></tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <script src="/public/js/main.js"></script>
+</body>
+</html>
