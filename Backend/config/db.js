@@ -1,8 +1,14 @@
 const mongoose = require("mongoose");
 
+mongoose.set("bufferCommands", false);
+
 let connectionPromise = null;
 
 async function connectDatabase() {
+    if (mongoose.connection.readyState === 1) {
+        return mongoose.connection;
+    }
+
     if (connectionPromise) {
         return connectionPromise;
     }
@@ -10,8 +16,7 @@ async function connectDatabase() {
     const mongoUri = process.env.MONGODB_URI;
 
     if (!mongoUri || mongoUri.includes("PASTE_YOUR_MONGODB_ATLAS_CONNECTION_STRING_HERE")) {
-        console.log("MONGODB_URI is missing. Add your MongoDB Atlas connection string in Backend/.env or Vercel env vars.");
-        return null;
+        throw new Error("MONGODB_URI is missing. Add it in Vercel Environment Variables.");
     }
 
     connectionPromise = mongoose
