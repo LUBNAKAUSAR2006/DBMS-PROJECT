@@ -115,7 +115,8 @@ router.post("/register", async (request, response) => {
             redirectPath: `/auth?mode=login&role=${role}`,
         });
     } catch (error) {
-        response.status(400).json({ message: "Unable to register user.", error: error.message });
+        console.error("Register error:", error);
+        response.status(400).json({ message: `Unable to register user: ${error.message}` });
     }
 });
 

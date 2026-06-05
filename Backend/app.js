@@ -32,6 +32,15 @@ app.use(
 );
 app.use("/public", express.static(path.join(frontendPath, "public")));
 
+app.use("/api", async (request, response, next) => {
+    try {
+        await connectDatabase();
+        next();
+    } catch (error) {
+        response.status(503).json({ message: "Database connection failed.", error: error.message });
+    }
+});
+
 app.use("/api/auth", authRoutes);
 app.use("/api/camps", requireLogin, campRoutes);
 app.use("/api/doctors", requireLogin, doctorRoutes);
