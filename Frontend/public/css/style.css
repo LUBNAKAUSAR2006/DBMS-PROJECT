@@ -358,8 +358,10 @@ tr th {
     margin-top: 0;
 }
 
-.hidden-field {
-    display: none;
+.simple-form label.hidden-field,
+.hidden-field,
+[hidden] {
+    display: none !important;
 }
 
 @media (max-width: 900px) {
