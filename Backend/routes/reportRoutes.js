@@ -271,26 +271,43 @@ router.get("/export/pdf", async (request, response) => {
         response.setHeader("Content-Disposition", "attachment; filename=healthcamp-report.pdf");
 
         document.pipe(response);
-        document.fontSize(18).text(request.currentUser.role === "Admin" ? "Health Camp Report" : "Patient Medical Report", { underline: true });
+        const isPatient = request.currentUser.role === "Patient";
+        document.fontSize(18).text(isPatient ? "Patient Medical Report" : "Health Camp Report", { underline: true });
         document.moveDown();
-        document.fontSize(12).text(`Total Patients: ${summary.totalPatients}`);
-        document.text(`Total Registrations: ${summary.totalRegistrations}`);
-        document.moveDown();
-        document.text("Gender Count:");
 
-        summary.genderCount.forEach((item) => {
-            document.text(`${item._id}: ${item.total}`);
-        });
+        if (isPatient) {
+            const own = registrations[0];
+            if (own && own.patient) {
+                document.fontSize(12)
+                    .text(`Patient Name: ${own.patient.fullName}`)
+                    .text(`Patient ID: ${own.patient.patientId}`)
+                    .text(`Age: ${own.patient.age || "-"}    Gender: ${own.patient.gender || "-"}`)
+                    .text(`Contact: ${own.patient.phone || "-"}`)
+                    .text(`City: ${own.patient.city || "-"}`);
+                document.moveDown();
+            }
+            document.fontSize(13).font("Helvetica-Bold").text("Consultation Records:");
+            document.font("Helvetica").fontSize(12);
+        } else {
+            document.fontSize(12).text(`Total Patients: ${summary.totalPatients}`);
+            document.text(`Total Registrations: ${summary.totalRegistrations}`);
+            document.moveDown();
+            document.text("Gender Count:");
 
-        document.moveDown();
-        document.text("Disease Trends:");
+            summary.genderCount.forEach((item) => {
+                document.text(`${item._id}: ${item.total}`);
+            });
 
-        summary.diseaseTrends.forEach((item) => {
-            document.text(`${item._id}: ${item.total}`);
-        });
+            document.moveDown();
+            document.text("Disease Trends:");
 
-        document.moveDown();
-        document.text("Consultation Records:");
+            summary.diseaseTrends.forEach((item) => {
+                document.text(`${item._id}: ${item.total}`);
+            });
+
+            document.moveDown();
+            document.text("Consultation Records:");
+        }
 
         registrations.forEach((item) => {
             document.moveDown(0.5);
@@ -303,6 +320,7 @@ router.get("/export/pdf", async (request, response) => {
                 .text(`Previous Details: ${item.previousConsultationDetails || item.previousReports || "None"}`)
                 .text(`Diagnosis: ${item.diagnosis || "Pending"}`)
                 .text(`Prescribed Medicines: ${item.medicines || "Pending"}`)
+                .text(`Previous Report Attachment: ${item.previousReportFile && item.previousReportFile.fileName ? item.previousReportFile.fileName : "None"}`)
                 .text(`Registered On: ${new Date(item.registrationTime).toLocaleString()}`);
         });
 

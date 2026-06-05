@@ -55,6 +55,11 @@ const consultationSchema = new mongoose.Schema(
             enum: ["Pending", "Consulted"],
             default: "Pending",
         },
+        previousReportFile: {
+            data: { type: String, default: "" },
+            mimeType: { type: String, default: "" },
+            fileName: { type: String, default: "" },
+        },
     },
     {
         timestamps: true,

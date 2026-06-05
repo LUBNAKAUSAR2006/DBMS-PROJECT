@@ -15,21 +15,43 @@ async function getCurrentUser() {
 }
 
 async function logoutUser() {
-    await requestData("/api/auth/logout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-    });
+    try {
+        await requestData("/api/auth/logout", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+        });
+    } catch (_error) {
+        // ignore; we still redirect to landing
+    }
 
-    window.location.href = "/";
+    window.location.replace("/");
 }
 
 async function setupProtectedPage() {
-    const user = await getCurrentUser();
+    let user;
+    try {
+        user = await getCurrentUser();
+    } catch (_error) {
+        window.location.replace("/");
+        throw _error;
+    }
+
+    if (!user) {
+        window.location.replace("/");
+        throw new Error("Not logged in.");
+    }
+
     const logoutButton = document.getElementById("logoutButton");
 
     if (logoutButton) {
         logoutButton.addEventListener("click", logoutUser);
     }
+
+    window.addEventListener("pageshow", (event) => {
+        if (event.persisted) {
+            logoutUser();
+        }
+    });
 
     document.querySelectorAll("[data-roles]").forEach((element) => {
         const roles = element.dataset.roles.split(",").map((item) => item.trim());
@@ -293,6 +315,9 @@ async function loadRegisterPage() {
                 <p><strong>Symptoms:</strong> ${latest.symptoms || "Not provided"}</p>
                 <p><strong>Diagnosis:</strong> ${latest.diagnosis || "Pending"}</p>
                 <p><strong>Prescribed Medicines:</strong> ${latest.medicines || "Pending"}</p>
+                <p><strong>Attached Previous Report:</strong> ${latest.previousReportFile && latest.previousReportFile.fileName
+                    ? `<a href="/api/patients/consultations/${latest._id}/attachment" target="_blank" rel="noopener">Download ${latest.previousReportFile.fileName}</a>`
+                    : "None"}</p>
                 <p><strong>Next Step:</strong> Open <a href="/reports">My Reports</a> to view full report and download.</p>
             </div>
         `;
@@ -311,6 +336,15 @@ async function loadRegisterPage() {
         const resultBox = document.getElementById("registrationResult");
 
         try {
+            const fileInput = document.getElementById("previousReportFileInput");
+            if (fileInput && fileInput.files && fileInput.files[0]) {
+                const file = fileInput.files[0];
+                if (file.size > 5 * 1024 * 1024) {
+                    throw new Error("Attachment must be 5MB or smaller.");
+                }
+                body.previousReportFile = await readFileAsBase64(file);
+            }
+
             await requestData("/api/patients/register", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -325,6 +359,24 @@ async function loadRegisterPage() {
         } catch (error) {
             showMessage(resultBox, error.message, true);
         }
+    });
+}
+
+function readFileAsBase64(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+            const result = reader.result || "";
+            const commaIndex = result.indexOf(",");
+            const base64 = commaIndex >= 0 ? result.slice(commaIndex + 1) : result;
+            resolve({
+                data: base64,
+                mimeType: file.type || "application/octet-stream",
+                fileName: file.name,
+            });
+        };
+        reader.onerror = () => reject(new Error("Failed to read attached file."));
+        reader.readAsDataURL(file);
     });
 }
 
@@ -482,6 +534,12 @@ function renderPatientReportCards(items) {
             <div class="patient-report-section">
                 <span>Prescribed Medicines</span>
                 <p>${item.medicines || "Pending - awaiting doctor consultation"}</p>
+            </div>
+            <div class="patient-report-section">
+                <span>Attached Previous Report</span>
+                <p>${item.previousReportFile && item.previousReportFile.fileName
+                    ? `<a href="/api/patients/consultations/${item._id}/attachment" target="_blank" rel="noopener">Download ${item.previousReportFile.fileName}</a>`
+                    : "No file attached"}</p>
             </div>
         </div>
     `).join("");

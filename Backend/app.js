@@ -17,8 +17,15 @@ const app = express();
 const port = process.env.PORT || 3000;
 const frontendPath = path.join(__dirname, "..", "Frontend");
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: "8mb" }));
+app.use(express.urlencoded({ extended: true, limit: "8mb" }));
+
+function noStoreHtml(_request, response, next) {
+    response.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
+    response.setHeader("Pragma", "no-cache");
+    response.setHeader("Expires", "0");
+    next();
+}
 app.use(
     session({
         secret: process.env.SESSION_SECRET || "simple_session_secret",
@@ -67,23 +74,23 @@ app.get("/auth", (request, response) => {
     response.sendFile(path.join(frontendPath, "views", "auth.html"));
 });
 
-app.get("/dashboard", requireLogin, (request, response) => {
+app.get("/dashboard", noStoreHtml, requireLogin, (request, response) => {
     response.sendFile(path.join(frontendPath, "views", "index.html"));
 });
 
-app.get("/admin", requireAnyRole("Admin"), (request, response) => {
+app.get("/admin", noStoreHtml, requireAnyRole("Admin"), (request, response) => {
     response.sendFile(path.join(frontendPath, "views", "admin.html"));
 });
 
-app.get("/register", requireAnyRole("Patient"), (request, response) => {
+app.get("/register", noStoreHtml, requireAnyRole("Patient"), (request, response) => {
     response.sendFile(path.join(frontendPath, "views", "register.html"));
 });
 
-app.get("/consultation", requireAnyRole("Doctor"), (request, response) => {
+app.get("/consultation", noStoreHtml, requireAnyRole("Doctor"), (request, response) => {
     response.sendFile(path.join(frontendPath, "views", "consultation.html"));
 });
 
-app.get("/reports", requireAnyRole("Admin", "Patient"), (request, response) => {
+app.get("/reports", noStoreHtml, requireAnyRole("Admin", "Patient"), (request, response) => {
     response.sendFile(path.join(frontendPath, "views", "reports.html"));
 });
 

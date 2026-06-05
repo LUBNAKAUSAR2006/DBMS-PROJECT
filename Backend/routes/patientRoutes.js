@@ -23,7 +23,7 @@ async function createTokenNumber(campId) {
 
 router.post("/register", requireAnyRole("Patient"), async (request, response) => {
     try {
-        const { age, gender, city, campId, doctorId, symptoms, previousReports, previousConsultationDetails } = request.body;
+        const { age, gender, city, campId, doctorId, symptoms, previousReports, previousConsultationDetails, previousReportFile } = request.body;
 
         let patient = await Patient.findOne({ user: request.currentUser.id });
 
@@ -48,7 +48,7 @@ router.post("/register", requireAnyRole("Patient"), async (request, response) =>
             await patient.save();
         }
 
-        const consultation = await Consultation.create({
+        const consultationDoc = {
             patient: patient._id,
             camp: campId,
             doctor: doctorId,
@@ -56,7 +56,17 @@ router.post("/register", requireAnyRole("Patient"), async (request, response) =>
             symptoms,
             previousReports,
             previousConsultationDetails,
-        });
+        };
+
+        if (previousReportFile && previousReportFile.data && previousReportFile.mimeType) {
+            consultationDoc.previousReportFile = {
+                data: previousReportFile.data,
+                mimeType: previousReportFile.mimeType,
+                fileName: previousReportFile.fileName || "previous-report",
+            };
+        }
+
+        const consultation = await Consultation.create(consultationDoc);
 
         response.status(201).json({
             message: "Patient registered successfully.",
@@ -65,6 +75,31 @@ router.post("/register", requireAnyRole("Patient"), async (request, response) =>
         });
     } catch (error) {
         response.status(400).json({ message: "Unable to register patient.", error: error.message });
+    }
+});
+
+router.get("/consultations/:id/attachment", requireAnyRole("Admin", "Doctor", "Patient"), async (request, response) => {
+    try {
+        const consultation = await Consultation.findById(request.params.id).populate("patient");
+
+        if (!consultation || !consultation.previousReportFile || !consultation.previousReportFile.data) {
+            return response.status(404).json({ message: "No attachment found." });
+        }
+
+        if (request.currentUser.role === "Patient") {
+            const ownPatient = await Patient.findOne({ user: request.currentUser.id });
+            if (!ownPatient || String(ownPatient._id) !== String(consultation.patient._id)) {
+                return response.status(403).json({ message: "Not allowed." });
+            }
+        }
+
+        const file = consultation.previousReportFile;
+        const buffer = Buffer.from(file.data, "base64");
+        response.setHeader("Content-Type", file.mimeType);
+        response.setHeader("Content-Disposition", `attachment; filename="${file.fileName}"`);
+        response.send(buffer);
+    } catch (error) {
+        response.status(500).json({ message: "Unable to fetch attachment." });
     }
 });
 
