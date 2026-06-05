@@ -12,7 +12,6 @@ const reportRoutes = require("./routes/reportRoutes");
 const { requireLogin, requireAnyRole } = require("./middleware/auth");
 
 dotenv.config({ path: path.join(__dirname, ".env") });
-connectDatabase();
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -31,6 +30,10 @@ app.use(
     })
 );
 app.use("/public", express.static(path.join(frontendPath, "public")));
+
+app.get("/api/ping", (request, response) => {
+    response.json({ ok: true, time: new Date().toISOString() });
+});
 
 app.use("/api", async (request, response, next) => {
     try {
