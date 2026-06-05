@@ -36,11 +36,19 @@ app.get("/api/ping", (request, response) => {
 });
 
 app.use("/api", async (request, response, next) => {
+    if (request.path === "/auth/logout" || request.path === "/auth/me") {
+        return next();
+    }
+
+    if (request.path === "/auth/login" && (request.body.email || "").toLowerCase().trim() === "admin@gmail.com") {
+        return next();
+    }
+
     try {
         await connectDatabase();
         next();
     } catch (error) {
-        response.status(503).json({ message: "Database connection failed.", error: error.message });
+        response.status(503).json({ message: `Database connection failed: ${error.message}` });
     }
 });
 
