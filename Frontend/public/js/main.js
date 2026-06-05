@@ -382,8 +382,10 @@ async function loadReportsPage() {
         document.getElementById("reportSummaryTitle").textContent = "My Report Summary";
         document.getElementById("reportSummaryNote").textContent = "This section shows only your own medical and registration data.";
         document.getElementById("reportFilterNote").textContent = "Filter only your own registrations by date or disease and download your report.";
-        document.getElementById("reportTableTitle").textContent = "My Registration History";
+        document.getElementById("reportTableTitle").textContent = "My Medical Records";
         document.getElementById("reportDoctorFilterWrapper").style.display = "none";
+        document.getElementById("reportTableWrapper").hidden = true;
+        document.getElementById("patientReportCards").hidden = false;
     } else {
         await loadDoctors("reportDoctorFilter", "", true);
     }
@@ -391,11 +393,11 @@ async function loadReportsPage() {
     drawBars(document.getElementById("genderChart"), summary.genderCount, "No gender data available.");
     drawBars(document.getElementById("ageChart"), summary.ageGroups, "No age data available.");
     drawBars(document.getElementById("diseaseChart"), summary.diseaseTrends, "No diagnosis data available.");
-    await loadReportTable();
+    await loadReportTable(null, user.role);
 
     document.getElementById("reportFilterForm").addEventListener("submit", async (event) => {
         event.preventDefault();
-        await loadReportTable(event.target);
+        await loadReportTable(event.target, user.role);
     });
 
     document.getElementById("csvExportButton").addEventListener("click", () => {
@@ -409,10 +411,63 @@ async function loadReportsPage() {
     });
 }
 
-async function loadReportTable(form = null) {
+function renderPatientReportCards(items) {
+    const container = document.getElementById("patientReportCards");
+
+    if (!items.length) {
+        container.innerHTML = '<p class="empty-state">No records found.</p>';
+        return;
+    }
+
+    container.innerHTML = items.map((item) => `
+        <div class="patient-report-card">
+            <div class="patient-report-header">
+                <strong>${item.camp.campName}</strong>
+                <span class="status-badge status-${item.status.toLowerCase()}">${item.status}</span>
+            </div>
+            <div class="patient-report-grid">
+                <div><span>Patient ID</span><strong>${item.patient.patientId}</strong></div>
+                <div><span>Patient Name</span><strong>${item.patient.fullName}</strong></div>
+                <div><span>Age</span><strong>${item.patient.age || "-"}</strong></div>
+                <div><span>Gender</span><strong>${item.patient.gender || "-"}</strong></div>
+                <div><span>Contact</span><strong>${item.patient.phone || "-"}</strong></div>
+                <div><span>City</span><strong>${item.patient.city || "-"}</strong></div>
+                <div><span>Camp Date</span><strong>${item.camp.campDate ? String(item.camp.campDate).slice(0, 10) : "-"}</strong></div>
+                <div><span>Camp Location</span><strong>${item.camp.location || "-"}</strong></div>
+                <div><span>Doctor Consulted</span><strong>${item.doctor.doctorName} (${item.doctor.specialization || "-"})</strong></div>
+                <div><span>Token Number</span><strong>${item.tokenNumber}</strong></div>
+                <div><span>Registered On</span><strong>${new Date(item.registrationTime).toLocaleString()}</strong></div>
+            </div>
+            <div class="patient-report-section">
+                <span>Symptoms</span>
+                <p>${item.symptoms || "Not provided"}</p>
+            </div>
+            <div class="patient-report-section">
+                <span>Previous Reports / Details</span>
+                <p>${item.previousConsultationDetails || item.previousReports || "None"}</p>
+            </div>
+            <div class="patient-report-section">
+                <span>Diagnosis</span>
+                <p>${item.diagnosis || "Pending - awaiting doctor consultation"}</p>
+            </div>
+            <div class="patient-report-section">
+                <span>Prescribed Medicines</span>
+                <p>${item.medicines || "Pending - awaiting doctor consultation"}</p>
+            </div>
+        </div>
+    `).join("");
+}
+
+async function loadReportTable(form = null, role = "Admin") {
     const query = form ? buildQueryString(form) : "";
     const url = query ? `/api/reports/registrations?${query}` : "/api/reports/registrations";
     const items = await requestData(url);
+
+    if (role === "Patient") {
+        renderPatientReportCards(items);
+        return;
+    }
+
     const tableBody = document.getElementById("reportTableBody");
 
     tableBody.innerHTML = items.length

@@ -204,20 +204,49 @@ router.get("/registrations", async (request, response) => {
 router.get("/export/csv", async (request, response) => {
     try {
         const registrations = await buildRegistrations(request);
-        const rows = [
-            ["Patient ID", "Patient Name", "Doctor", "Camp", "Diagnosis", "Status", "Date"].join(",")
+        const headers = [
+            "Patient ID",
+            "Patient Name",
+            "Age",
+            "Gender",
+            "Contact",
+            "City",
+            "Camp",
+            "Camp Date",
+            "Camp Location",
+            "Doctor",
+            "Specialization",
+            "Token",
+            "Symptoms",
+            "Previous Details",
+            "Diagnosis",
+            "Prescribed Medicines",
+            "Status",
+            "Registered On",
         ];
+        const rows = [headers.join(",")];
 
         registrations.forEach((item) => {
             rows.push(
                 [
                     item.patient.patientId,
                     item.patient.fullName,
-                    item.doctor.doctorName,
+                    item.patient.age || "",
+                    item.patient.gender || "",
+                    item.patient.phone || "",
+                    item.patient.city || "",
                     item.camp.campName,
+                    item.camp.campDate ? String(item.camp.campDate).slice(0, 10) : "",
+                    item.camp.location || "",
+                    item.doctor.doctorName,
+                    item.doctor.specialization || "",
+                    item.tokenNumber,
+                    item.symptoms || "",
+                    item.previousConsultationDetails || item.previousReports || "",
                     item.diagnosis || "Pending",
+                    item.medicines || "Pending",
                     item.status,
-                    new Date(item.registrationTime).toLocaleDateString(),
+                    new Date(item.registrationTime).toLocaleString(),
                 ]
                     .map((value) => `"${String(value).replace(/"/g, '""')}"`)
                     .join(",")
@@ -264,7 +293,17 @@ router.get("/export/pdf", async (request, response) => {
         document.text("Consultation Records:");
 
         registrations.forEach((item) => {
-            document.text(`${item.camp.campName} | ${item.doctor.doctorName} | ${item.diagnosis || "Pending"} | ${item.status}`);
+            document.moveDown(0.5);
+            document.font("Helvetica-Bold").text(`${item.camp.campName} (${item.camp.campDate ? String(item.camp.campDate).slice(0, 10) : ""})`);
+            document.font("Helvetica")
+                .text(`Patient: ${item.patient.fullName} (${item.patient.patientId})`)
+                .text(`Doctor: ${item.doctor.doctorName} - ${item.doctor.specialization || ""}`)
+                .text(`Token: ${item.tokenNumber} | Status: ${item.status}`)
+                .text(`Symptoms: ${item.symptoms || "Not provided"}`)
+                .text(`Previous Details: ${item.previousConsultationDetails || item.previousReports || "None"}`)
+                .text(`Diagnosis: ${item.diagnosis || "Pending"}`)
+                .text(`Prescribed Medicines: ${item.medicines || "Pending"}`)
+                .text(`Registered On: ${new Date(item.registrationTime).toLocaleString()}`);
         });
 
         document.end();

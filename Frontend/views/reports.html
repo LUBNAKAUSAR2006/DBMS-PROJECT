@@ -13,7 +13,6 @@
             <p id="reportPageDescription">Download reports and view data allowed for your role.</p>
         </div>
         <nav class="nav-links">
-            <a href="/dashboard">Dashboard</a>
             <a href="/admin" data-roles="Admin">Admin</a>
             <a href="/register" data-roles="Patient">Patient Registration</a>
             <button type="button" id="logoutButton">Logout</button>
@@ -64,7 +63,7 @@
 
         <section class="card">
             <h2 id="reportTableTitle">Registration Table</h2>
-            <div class="table-wrapper">
+            <div class="table-wrapper" id="reportTableWrapper">
                 <table>
                     <thead>
                         <tr>
@@ -81,6 +80,7 @@
                     <tbody id="reportTableBody"></tbody>
                 </table>
             </div>
+            <div id="patientReportCards" class="patient-report-cards" hidden></div>
         </section>
     </main>
 
