@@ -1,0 +1,17 @@
+{
+  "name": "dbms-project",
+  "version": "1.0.0",
+  "private": true,
+  "main": "index.js",
+  "scripts": {
+    "start": "node Backend/app.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "express-session": "^1.19.0",
+    "mongoose": "^9.6.3",
+    "pdfkit": "^0.18.0"
+  }
+}
