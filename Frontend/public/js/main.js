@@ -136,7 +136,39 @@ async function loadAdminPage() {
     const doctors = await requestData("/api/doctors");
     const campList = document.getElementById("campList");
     const doctorList = document.getElementById("doctorList");
-    fillMultiSelect(document.getElementById("campDoctors"), doctors, (doctor) => `${doctor.doctorName} - ${doctor.specialization}`);
+    const doctorPicker = document.getElementById("campDoctorPicker");
+    const addDoctorButton = document.getElementById("addDoctorButton");
+    const selectedDoctorsList = document.getElementById("selectedDoctorsList");
+    const selectedDoctorIds = new Set();
+
+    fillSelect(doctorPicker, doctors, (doctor) => `${doctor.doctorName} - ${doctor.specialization}`);
+
+    function renderSelectedDoctors() {
+        if (selectedDoctorIds.size === 0) {
+            selectedDoctorsList.innerHTML = '<span class="empty-state">No doctors selected yet.</span>';
+            return;
+        }
+        selectedDoctorsList.innerHTML = Array.from(selectedDoctorIds).map((id) => {
+            const doctor = doctors.find((item) => item._id === id);
+            const label = doctor ? `${doctor.doctorName} - ${doctor.specialization}` : id;
+            return `<span class="doctor-chip">${label}<button type="button" data-id="${id}" class="remove-doctor-chip">x</button></span>`;
+        }).join("");
+        selectedDoctorsList.querySelectorAll(".remove-doctor-chip").forEach((button) => {
+            button.addEventListener("click", () => {
+                selectedDoctorIds.delete(button.dataset.id);
+                renderSelectedDoctors();
+            });
+        });
+    }
+
+    addDoctorButton.addEventListener("click", () => {
+        const value = doctorPicker.value;
+        if (!value) {
+            return;
+        }
+        selectedDoctorIds.add(value);
+        renderSelectedDoctors();
+    });
 
     campList.innerHTML = camps.length
         ? camps.map((camp) => `<div class="list-item"><strong>${camp.campName}</strong><p>${camp.location} | ${camp.campDate}</p><p>Doctors: ${camp.assignedDoctors.length ? camp.assignedDoctors.map((doctor) => doctor.doctorName).join(", ") : "No doctors assigned"}</p><button type="button" class="remove-camp-button" data-id="${camp._id}">Remove Camp</button></div>`).join("")
@@ -150,9 +182,13 @@ async function loadAdminPage() {
         event.preventDefault();
         const form = event.target;
         const formData = new FormData(form);
-        const selectedDoctors = Array.from(document.getElementById("campDoctors").selectedOptions).map((option) => option.value);
         const body = Object.fromEntries(formData.entries());
-        body.assignedDoctors = selectedDoctors;
+        body.assignedDoctors = Array.from(selectedDoctorIds);
+
+        if (body.assignedDoctors.length === 0) {
+            alert("Please select at least one doctor before saving the camp.");
+            return;
+        }
 
         await requestData("/api/camps", {
             method: "POST",

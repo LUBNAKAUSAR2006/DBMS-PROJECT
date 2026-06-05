@@ -364,6 +364,62 @@ tr th {
     display: none !important;
 }
 
+.doctor-picker {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.doctor-picker select {
+    flex: 1;
+}
+
+.doctor-picker button {
+    padding: 8px 14px;
+    border: none;
+    border-radius: 8px;
+    background-color: var(--primary);
+    color: #ffffff;
+    cursor: pointer;
+    font-weight: 700;
+}
+
+.selected-doctors-area {
+    border: 1px dashed var(--soft-border);
+    border-radius: 12px;
+    padding: 10px 12px;
+    background-color: #f8fbff;
+    display: grid;
+    gap: 8px;
+}
+
+.selected-doctors-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.doctor-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background-color: #e0ecff;
+    color: #1d4ed8;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.doctor-chip button {
+    background: transparent;
+    border: none;
+    color: #1d4ed8;
+    cursor: pointer;
+    font-weight: 700;
+    padding: 0;
+}
+
 @media (max-width: 900px) {
     .hero-panel {
         grid-template-columns: 1fr;

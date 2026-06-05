@@ -13,8 +13,6 @@
             <p>Create camps, assign registered doctors, and remove camps if no patient is linked.</p>
         </div>
         <nav class="nav-links">
-            <a href="/dashboard">Dashboard</a>
-            <a href="/reports">Reports</a>
             <button type="button" id="logoutButton">Logout</button>
         </nav>
     </header>
@@ -28,9 +26,19 @@
                 <label>Camp Date<input type="date" name="campDate" required></label>
                 <label>Location<span class="helper-text">Example: Community Hall, College Campus</span><input type="text" name="location" required></label>
                 <label>Purpose<span class="helper-text">Example: Eye checkup or general screening</span><input type="text" name="purpose" required></label>
-                <label>Assign Doctors
-                    <select id="campDoctors" name="assignedDoctors" multiple required></select>
+                <label>Select Doctors
+                    <span class="helper-text">Pick a doctor from the dropdown and click Add. Repeat to assign multiple doctors.</span>
+                    <div class="doctor-picker">
+                        <select id="campDoctorPicker"></select>
+                        <button type="button" id="addDoctorButton">Add</button>
+                    </div>
                 </label>
+                <div class="selected-doctors-area">
+                    <strong>Selected Doctors</strong>
+                    <div id="selectedDoctorsList" class="selected-doctors-list">
+                        <span class="empty-state">No doctors selected yet.</span>
+                    </div>
+                </div>
                 <button type="submit">Save Camp</button>
             </form>
         </section>
