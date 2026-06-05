@@ -139,7 +139,10 @@ async function loadAdminPage() {
     const doctorPicker = document.getElementById("campDoctorPicker");
     const addDoctorButton = document.getElementById("addDoctorButton");
     const selectedDoctorsList = document.getElementById("selectedDoctorsList");
+    const campForm = document.getElementById("campForm");
+    const submitButton = campForm.querySelector('button[type="submit"]');
     const selectedDoctorIds = new Set();
+    let editingCampId = null;
 
     fillSelect(doctorPicker, doctors, (doctor) => `${doctor.doctorName} - ${doctor.specialization}`);
 
@@ -161,6 +164,27 @@ async function loadAdminPage() {
         });
     }
 
+    function resetCampForm() {
+        editingCampId = null;
+        campForm.reset();
+        selectedDoctorIds.clear();
+        renderSelectedDoctors();
+        submitButton.textContent = "Save Camp";
+    }
+
+    function startEditCamp(camp) {
+        editingCampId = camp._id;
+        campForm.campName.value = camp.campName;
+        campForm.campDate.value = String(camp.campDate).slice(0, 10);
+        campForm.location.value = camp.location;
+        campForm.purpose.value = camp.purpose;
+        selectedDoctorIds.clear();
+        (camp.assignedDoctors || []).forEach((doctor) => selectedDoctorIds.add(doctor._id || doctor));
+        renderSelectedDoctors();
+        submitButton.textContent = "Update Camp";
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
     addDoctorButton.addEventListener("click", () => {
         const value = doctorPicker.value;
         if (!value) {
@@ -171,17 +195,16 @@ async function loadAdminPage() {
     });
 
     campList.innerHTML = camps.length
-        ? camps.map((camp) => `<div class="list-item"><strong>${camp.campName}</strong><p>${camp.location} | ${camp.campDate}</p><p>Doctors: ${camp.assignedDoctors.length ? camp.assignedDoctors.map((doctor) => doctor.doctorName).join(", ") : "No doctors assigned"}</p><button type="button" class="remove-camp-button" data-id="${camp._id}">Remove Camp</button></div>`).join("")
+        ? camps.map((camp) => `<div class="list-item"><strong>${camp.campName}</strong><p>${camp.location} | ${String(camp.campDate).slice(0, 10)}</p><p>Doctors: ${camp.assignedDoctors.length ? camp.assignedDoctors.map((doctor) => doctor.doctorName).join(", ") : "No doctors assigned"}</p><div class="camp-actions"><button type="button" class="edit-camp-button" data-id="${camp._id}">Edit</button><button type="button" class="remove-camp-button" data-id="${camp._id}">Remove Camp</button></div></div>`).join("")
         : '<p class="empty-state">No camps added yet.</p>';
 
     doctorList.innerHTML = doctors.length
         ? doctors.map((doctor) => `<div class="list-item"><strong>${doctor.doctorName}</strong><p>${doctor.specialization}</p><p>${doctor.doctorEmail} | ${doctor.doctorPhone}</p></div>`).join("")
         : '<p class="empty-state">No doctors added yet.</p>';
 
-    document.getElementById("campForm").addEventListener("submit", async (event) => {
+    campForm.addEventListener("submit", async (event) => {
         event.preventDefault();
-        const form = event.target;
-        const formData = new FormData(form);
+        const formData = new FormData(campForm);
         const body = Object.fromEntries(formData.entries());
         body.assignedDoctors = Array.from(selectedDoctorIds);
 
@@ -190,19 +213,46 @@ async function loadAdminPage() {
             return;
         }
 
-        await requestData("/api/camps", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(body),
-        });
-
-        window.location.reload();
+        try {
+            if (editingCampId) {
+                await requestData(`/api/camps/${editingCampId}`, {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(body),
+                });
+            } else {
+                await requestData("/api/camps", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(body),
+                });
+            }
+            window.location.reload();
+        } catch (error) {
+            alert(error.message);
+        }
     });
 
     document.querySelectorAll(".remove-camp-button").forEach((button) => {
         button.addEventListener("click", async () => {
-            await requestData(`/api/camps/${button.dataset.id}`, { method: "DELETE" });
-            window.location.reload();
+            if (!confirm("Remove this camp?")) {
+                return;
+            }
+            try {
+                await requestData(`/api/camps/${button.dataset.id}`, { method: "DELETE" });
+                window.location.reload();
+            } catch (error) {
+                alert(error.message);
+            }
+        });
+    });
+
+    document.querySelectorAll(".edit-camp-button").forEach((button) => {
+        button.addEventListener("click", () => {
+            const camp = camps.find((item) => item._id === button.dataset.id);
+            if (camp) {
+                startEditCamp(camp);
+            }
         });
     });
 }

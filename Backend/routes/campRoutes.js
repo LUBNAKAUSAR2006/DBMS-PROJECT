@@ -23,6 +23,23 @@ router.post("/", requireAnyRole("Admin"), async (request, response) => {
     }
 });
 
+router.put("/:id", requireAnyRole("Admin"), async (request, response) => {
+    try {
+        const updated = await Camp.findByIdAndUpdate(request.params.id, request.body, {
+            new: true,
+            runValidators: true,
+        }).populate("assignedDoctors");
+
+        if (!updated) {
+            return response.status(404).json({ message: "Camp not found." });
+        }
+
+        response.json(updated);
+    } catch (error) {
+        response.status(400).json({ message: "Unable to update camp.", error: error.message });
+    }
+});
+
 router.delete("/:id", requireAnyRole("Admin"), async (request, response) => {
     try {
         const linkedConsultations = await Consultation.countDocuments({ camp: request.params.id });

@@ -420,6 +420,32 @@ tr th {
     padding: 0;
 }
 
+.camp-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+    flex-wrap: wrap;
+}
+
+.camp-actions button {
+    padding: 6px 12px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 13px;
+}
+
+.edit-camp-button {
+    background-color: #e0ecff;
+    color: #1d4ed8;
+}
+
+.remove-camp-button {
+    background-color: var(--primary);
+    color: #ffffff;
+}
+
 @media (max-width: 900px) {
     .hero-panel {
         grid-template-columns: 1fr;
