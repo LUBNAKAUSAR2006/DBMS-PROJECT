@@ -259,42 +259,69 @@ async function loadAdminPage() {
 
 async function loadRegisterPage() {
     const user = await setupProtectedPage();
+    const form = document.getElementById("registrationForm");
     document.getElementById("patientAccountName").value = user.fullName;
     document.getElementById("patientAccountEmail").value = user.email;
     document.getElementById("patientAccountContact").value = user.contactNumber;
     await loadCamps("patientCamp");
     await loadDoctors("patientDoctor");
 
+    async function refreshLatestRegistration() {
+        const data = await requestData("/api/patients/me/history");
+        const resultBox = document.getElementById("registrationResult");
+
+        if (data.patient) {
+            if (form.age && !form.age.value) form.age.value = data.patient.age || "";
+            if (form.gender && !form.gender.value) form.gender.value = data.patient.gender || "";
+            if (form.city && !form.city.value) form.city.value = data.patient.city || "";
+        }
+
+        if (!data.consultations.length) {
+            resultBox.innerHTML = "No camp registration yet.";
+            return;
+        }
+
+        const latest = data.consultations[0];
+        resultBox.innerHTML = `
+            <div class="result-item">
+                <p><strong>Patient ID:</strong> ${data.patient.patientId}</p>
+                <p><strong>Patient Name:</strong> ${data.patient.fullName}</p>
+                <p><strong>Camp:</strong> ${latest.camp.campName} (${String(latest.camp.campDate).slice(0, 10)})</p>
+                <p><strong>Doctor:</strong> ${latest.doctor.doctorName} - ${latest.doctor.specialization || ""}</p>
+                <p><strong>Token Number:</strong> ${latest.tokenNumber}</p>
+                <p><strong>Status:</strong> ${latest.status}</p>
+                <p><strong>Symptoms:</strong> ${latest.symptoms || "Not provided"}</p>
+                <p><strong>Diagnosis:</strong> ${latest.diagnosis || "Pending"}</p>
+                <p><strong>Prescribed Medicines:</strong> ${latest.medicines || "Pending"}</p>
+                <p><strong>Next Step:</strong> Open <a href="/reports">My Reports</a> to view full report and download.</p>
+            </div>
+        `;
+    }
+
+    await refreshLatestRegistration();
+
     document.getElementById("patientCamp").addEventListener("change", async (event) => {
         await loadDoctors("patientDoctor", event.target.value);
     });
 
-    document.getElementById("registrationForm").addEventListener("submit", async (event) => {
+    form.addEventListener("submit", async (event) => {
         event.preventDefault();
         const formData = new FormData(event.target);
         const body = Object.fromEntries(formData.entries());
         const resultBox = document.getElementById("registrationResult");
 
         try {
-            const result = await requestData("/api/patients/register", {
+            await requestData("/api/patients/register", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(body),
             });
 
-            resultBox.innerHTML = `
-                <div class="result-item">
-                    <p><strong>Patient ID:</strong> ${result.patient.patientId}</p>
-                    <p><strong>Patient Name:</strong> ${result.patient.fullName}</p>
-                    <p><strong>Token Number:</strong> ${result.consultation.tokenNumber}</p>
-                    <p><strong>Status:</strong> ${result.consultation.status}</p>
-                    <p><strong>Next Step:</strong> Open My Reports after doctor consultation is completed.</p>
-                </div>
-            `;
             event.target.reset();
             document.getElementById("patientAccountName").value = user.fullName;
             document.getElementById("patientAccountEmail").value = user.email;
             document.getElementById("patientAccountContact").value = user.contactNumber;
+            await refreshLatestRegistration();
         } catch (error) {
             showMessage(resultBox, error.message, true);
         }
@@ -373,26 +400,28 @@ function buildQueryString(form) {
 
 async function loadReportsPage() {
     const user = await setupProtectedPage();
-    const summary = await requestData("/api/reports/summary");
-    document.getElementById("reportTotalPatients").textContent = summary.totalPatients;
-    document.getElementById("reportTotalRegistrations").textContent = summary.totalRegistrations;
 
     if (user.role === "Patient") {
-        document.getElementById("reportPageDescription").textContent = "View your own registrations, diagnosis records, and download your personal report.";
-        document.getElementById("reportSummaryTitle").textContent = "My Report Summary";
-        document.getElementById("reportSummaryNote").textContent = "This section shows only your own medical and registration data.";
-        document.getElementById("reportFilterNote").textContent = "Filter only your own registrations by date or disease and download your report.";
+        document.getElementById("reportPageDescription").textContent = "Your personal medical report. Download as PDF or CSV.";
+        document.getElementById("reportSummaryCard").hidden = true;
         document.getElementById("reportTableTitle").textContent = "My Medical Records";
-        document.getElementById("reportDoctorFilterWrapper").style.display = "none";
         document.getElementById("reportTableWrapper").hidden = true;
         document.getElementById("patientReportCards").hidden = false;
+        document.getElementById("reportKeyword").style.display = "none";
+        document.getElementById("reportDisease").style.display = "none";
+        document.getElementById("reportDoctorFilterWrapper").style.display = "none";
+        document.getElementById("reportApplyButton").style.display = "none";
+        document.getElementById("reportFilterNote").textContent = "Download your personal medical report.";
     } else {
+        const summary = await requestData("/api/reports/summary");
+        document.getElementById("reportTotalPatients").textContent = summary.totalPatients;
+        document.getElementById("reportTotalRegistrations").textContent = summary.totalRegistrations;
+        drawBars(document.getElementById("genderChart"), summary.genderCount, "No gender data available.");
+        drawBars(document.getElementById("ageChart"), summary.ageGroups, "No age data available.");
+        drawBars(document.getElementById("diseaseChart"), summary.diseaseTrends, "No diagnosis data available.");
         await loadDoctors("reportDoctorFilter", "", true);
     }
 
-    drawBars(document.getElementById("genderChart"), summary.genderCount, "No gender data available.");
-    drawBars(document.getElementById("ageChart"), summary.ageGroups, "No age data available.");
-    drawBars(document.getElementById("diseaseChart"), summary.diseaseTrends, "No diagnosis data available.");
     await loadReportTable(null, user.role);
 
     document.getElementById("reportFilterForm").addEventListener("submit", async (event) => {

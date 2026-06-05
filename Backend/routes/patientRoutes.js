@@ -68,6 +68,25 @@ router.post("/register", requireAnyRole("Patient"), async (request, response) =>
     }
 });
 
+router.get("/me/history", requireAnyRole("Patient"), async (request, response) => {
+    try {
+        const patient = await Patient.findOne({ user: request.currentUser.id });
+
+        if (!patient) {
+            return response.json({ patient: null, consultations: [] });
+        }
+
+        const consultations = await Consultation.find({ patient: patient._id })
+            .populate("camp")
+            .populate("doctor")
+            .sort({ registrationTime: -1 });
+
+        response.json({ patient, consultations });
+    } catch (error) {
+        response.status(500).json({ message: "Unable to fetch your history." });
+    }
+});
+
 router.get("/search", requireAnyRole("Admin", "Doctor"), async (request, response) => {
     try {
         const keyword = request.query.keyword || "";

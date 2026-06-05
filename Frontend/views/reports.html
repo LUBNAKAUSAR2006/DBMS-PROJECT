@@ -20,7 +20,7 @@
     </header>
 
     <main class="page-content">
-        <section class="card">
+        <section class="card" id="reportSummaryCard">
             <h2 id="reportSummaryTitle">Summary</h2>
             <p class="card-note" id="reportSummaryNote">This section shows simple analytics built from MongoDB data using count and aggregation queries.</p>
             <div class="summary-grid">
@@ -43,18 +43,18 @@
             </div>
         </section>
 
-        <section class="card">
+        <section class="card" id="reportFilterCard">
             <h2>Search and Filters</h2>
             <p class="card-note" id="reportFilterNote">Use these fields to search by patient, filter by date, disease, or doctor, and export the result.</p>
             <form id="reportFilterForm" class="filter-form">
-                <input type="text" name="keyword" placeholder="Search by patient name or patient ID">
+                <input type="text" name="keyword" placeholder="Search by patient name or patient ID" id="reportKeyword">
                 <input type="date" name="date">
-                <input type="text" name="disease" placeholder="Filter by disease">
+                <input type="text" name="disease" placeholder="Filter by disease" id="reportDisease">
                 <div id="reportDoctorFilterWrapper">
                     <select id="reportDoctorFilter" name="doctorId"></select>
                 </div>
                 <div class="button-row">
-                    <button type="submit">Apply Filters</button>
+                    <button type="submit" id="reportApplyButton">Apply Filters</button>
                     <button type="button" id="csvExportButton">Download CSV</button>
                     <button type="button" id="pdfExportButton">Download PDF</button>
                 </div>
